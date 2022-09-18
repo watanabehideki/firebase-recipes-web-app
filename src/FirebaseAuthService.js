@@ -14,7 +14,7 @@ const logoutUser = () => {
   return auth.signOut()
 }
 
-const sendPasswardResetEmail = (email) => {
+const sendPasswordResetEmail = (email) => {
   return auth.sendPasswordResetEmail(email)
 }
 
@@ -33,7 +33,7 @@ const FirebaseAuthService = {
   registerUser,
   loginUser,
   logoutUser,
-  sendPasswardResetEmail,
+  sendPasswordResetEmail,
   loginWithGoogle,
   subscribeToAuthChanges,
 }
