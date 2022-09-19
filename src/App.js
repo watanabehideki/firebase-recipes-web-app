@@ -12,6 +12,7 @@ function App() {
   const [recipes, setRecipes] = useState()
   const [isLoading, setIsLoading] = useState(true)
   const [categoryFilter, setCategoryFilter] = useState("")
+  const [orderBy, setOrderBy] = useState("publishDateDesc")
 
   useEffect(() => {
     setIsLoading(true)
@@ -24,11 +25,12 @@ function App() {
         throw error
       })
       .finally(() => setIsLoading(false))
-  }, [user, categoryFilter])
+  }, [user, categoryFilter, orderBy])
 
   async function fetchRecipes() {
     const queries = []
 
+    // where句の設定
     if (categoryFilter) {
       queries.push({
         field: "category",
@@ -43,11 +45,30 @@ function App() {
         value: true,
       })
     }
+
+    // order句の設定
+    const orderByField = "publishDate"
+    let orderByDirection
+    if (orderBy) {
+      switch (orderBy) {
+        case "publishDateAsc":
+          orderByDirection = "asc"
+          break
+        case "publishDateDesc":
+          orderByDirection = "desc"
+          break
+        default:
+          break
+      }
+    }
+
     let fetchRecipes = []
     try {
       const response = await FirebaseFireStoreService.readDocument({
         collection: "recipes",
         queries: queries,
+        orderByField: orderByField,
+        orderByDirection: orderByDirection,
       })
       const newRecipes = response.docs.map((recipeDoc) => {
         const id = recipeDoc.id
@@ -185,6 +206,18 @@ function App() {
               <option value="dessertsAndBakedGoods">デザートと焼き菓子</option>
               <option value="fishAndSeafood">魚とシーフード</option>
               <option value="veg">野菜</option>
+            </select>
+          </label>
+          <label className="input-label">
+            公開日：
+          <select
+              className="select"
+              required
+              value={orderBy}
+              onChange={(e) => setOrderBy(e.target.value)}
+            >
+              <option value="publishDateDesc">古い順</option>
+              <option value="publishDateAsc">新しい順</option>
             </select>
           </label>
         </div>
