@@ -8,7 +8,6 @@ import FirebaseFireStoreService from "./FirebaseFireStoreService"
 function App() {
   const [user, setUser] = useState(null)
   const [currentRecipe, setCurrentRecipe] = useState(null)
-
   const [recipes, setRecipes] = useState()
 
   useEffect(() => {
@@ -79,6 +78,23 @@ function App() {
       throw error
     } finally {
       setCurrentRecipe(null)
+    }
+  }
+
+  async function handleDeleteRecipe(recipeId) {
+    const deleteConfirmation = window.confirm("削除してもよろしいですか？")
+
+    if (deleteConfirmation) {
+      try {
+        await FirebaseFireStoreService.deleteDocument("recipes", recipeId)
+        handleFetchRecipes()
+        setCurrentRecipe(null)
+        window.scroll(0, 0)
+        alert(`successfully deleted a recipe with an ID = ${recipeId}`)
+      } catch (error) {
+        console.error(error.message)
+        throw error
+      }
     }
   }
 
@@ -179,6 +195,7 @@ function App() {
             handleUpdateRecipe={handleUpdateRecipe}
             handleEditRecipeCancel={handleEditRecipeCancel}
             handleAddRecipe={handleAddRecipe}
+            handleDeleteRecipe={handleDeleteRecipe}
           />
         ) : null}
       </div>

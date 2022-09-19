@@ -5,6 +5,7 @@ function AddEditRecipeForm({
   handleUpdateRecipe,
   handleEditRecipeCancel,
   handleAddRecipe,
+  handleDeleteRecipe,
 }) {
   useEffect(() => {
     if (existingRecipe) {
@@ -193,13 +194,22 @@ function AddEditRecipeForm({
           {existingRecipe ? "編集内容を保存" : "レシピを作成"}
         </button>
         {existingRecipe ? (
-          <button
-            className="primary-button action-button"
-            type="button"
-            onClick={handleEditRecipeCancel}
-          >
-            キャンセル
-          </button>
+          <>
+            <button
+              className="primary-button action-button"
+              type="button"
+              onClick={handleEditRecipeCancel}
+            >
+              キャンセル
+            </button>
+            <button
+              className="primary-button action-button"
+              type="button"
+              onClick={() => handleDeleteRecipe(existingRecipe.id)}
+            >
+              削除
+            </button>
+          </>
         ) : null}
       </div>
     </form>
