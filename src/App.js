@@ -4,13 +4,16 @@ import LoginForm from "./components/LoginForm"
 import FirebaseAuthService from "./FirebaseAuthService"
 import AddEditRecipeForm from "./components/AddEditRecipeForm"
 import FirebaseFireStoreService from "./FirebaseFireStoreService"
+import Loading from "./components/Loading"
 
 function App() {
   const [user, setUser] = useState(null)
   const [currentRecipe, setCurrentRecipe] = useState(null)
   const [recipes, setRecipes] = useState()
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    setIsLoading(true)
     fetchRecipes()
       .then((fetchRecipes) => {
         setRecipes(fetchRecipes)
@@ -19,6 +22,7 @@ function App() {
         console.error(error.message)
         throw error
       })
+      .finally(() => setIsLoading(false))
   }, [user])
 
   async function fetchRecipes() {
@@ -157,7 +161,11 @@ function App() {
       <div className="main">
         <div className="center">
           <div className="recipe-list-box">
-            {recipes && recipes.length > 0 ? (
+            {isLoading ? <Loading /> : null}
+            {!isLoading && recipes && recipes.length === 0 ? (
+              <h5 className="no-recopes">レシピがありません</h5>
+            ) : null}
+            {!isLoading && recipes && recipes.length > 0 ? (
               <div className="recipe-list">
                 {recipes.map((recipe) => {
                   return (
