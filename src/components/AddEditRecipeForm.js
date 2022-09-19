@@ -108,8 +108,10 @@ function AddEditRecipeForm({ handleAddRecipe }) {
         <h3 className="text-center">材料</h3>
         <table className="ingredients-table">
           <thead>
-            <th className="table-header">材料</th>
-            <th className="table-header">削除</th>
+            <tr>
+              <th className="table-header">材料</th>
+              <th className="table-header">削除</th>
+            </tr>
           </thead>
           <tbody>
             {ingredients && ingredients.length > 0
