@@ -11,6 +11,7 @@ function App() {
   const [currentRecipe, setCurrentRecipe] = useState(null)
   const [recipes, setRecipes] = useState()
   const [isLoading, setIsLoading] = useState(true)
+  const [categoryFilter, setCategoryFilter] = useState("")
 
   useEffect(() => {
     setIsLoading(true)
@@ -23,10 +24,18 @@ function App() {
         throw error
       })
       .finally(() => setIsLoading(false))
-  }, [user])
+  }, [user, categoryFilter])
 
   async function fetchRecipes() {
     const queries = []
+
+    if (categoryFilter) {
+      queries.push({
+        field: "category",
+        condition: "==",
+        value: categoryFilter,
+      })
+    }
     if (!user) {
       queries.push({
         field: "isPublished",
@@ -159,6 +168,26 @@ function App() {
         <LoginForm existingUser={user} />
       </div>
       <div className="main">
+        <div className="row filters">
+          <label className="recipe-label input-label">
+            カテゴリー：
+            <select
+              className="select"
+              required
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            >
+              <option value=""></option>
+              <option value="breadsSandwichesAndPizza">
+                パン、サンドウィッチ、ピザ
+              </option>
+              <option value="eggsAndBreakfast">たまごと朝食</option>
+              <option value="dessertsAndBakedGoods">デザートと焼き菓子</option>
+              <option value="fishAndSeafood">魚とシーフード</option>
+              <option value="veg">野菜</option>
+            </select>
+          </label>
+        </div>
         <div className="center">
           <div className="recipe-list-box">
             {isLoading ? <Loading /> : null}
