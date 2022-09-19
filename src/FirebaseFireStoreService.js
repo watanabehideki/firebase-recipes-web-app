@@ -6,7 +6,12 @@ const createDocument = (collection, document) => {
   return firestore.collection(collection).add(document)
 }
 
-const readDocument = ({ collection, queries, orderByField, orderByDirection }) => {
+const readDocument = ({
+  collection,
+  queries,
+  orderByField,
+  orderByDirection,
+}) => {
   let collectionRef = firestore.collection(collection)
 
   // where句の設定
@@ -18,11 +23,11 @@ const readDocument = ({ collection, queries, orderByField, orderByDirection }) =
         query.value
       )
     }
-    // order句の設定
-    if(orderByField && orderByDirection) {
-      collectionRef = collectionRef.orderBy(orderByField, orderByDirection)
-    }
+  }
 
+  // order句の設定
+  if (orderByField && orderByDirection) {
+    collectionRef = collectionRef.orderBy(orderByField, orderByDirection)
   }
   return collectionRef.get()
 }

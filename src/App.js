@@ -216,8 +216,8 @@ function App() {
               value={orderBy}
               onChange={(e) => setOrderBy(e.target.value)}
             >
-              <option value="publishDateDesc">古い順</option>
-              <option value="publishDateAsc">新しい順</option>
+              <option value="publishDateDesc">新しい順</option>
+              <option value="publishDateAsc">古い順</option>
             </select>
           </label>
         </div>
