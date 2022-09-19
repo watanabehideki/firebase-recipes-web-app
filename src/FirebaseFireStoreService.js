@@ -21,9 +21,14 @@ const readDocument = ({ collection, queries }) => {
   return collectionRef.get()
 }
 
+const updateDocument = (collection, id, document) => {
+  return firestore.collection(collection).doc(id).update(document)
+}
+
 const FirebaseFireStoreService = {
   createDocument,
   readDocument,
+  updateDocument,
 }
 
 export default FirebaseFireStoreService

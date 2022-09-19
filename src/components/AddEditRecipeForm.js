@@ -1,6 +1,22 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
-function AddEditRecipeForm({ handleAddRecipe }) {
+function AddEditRecipeForm({
+  existingRecipe,
+  handleUpdateRecipe,
+  handleEditRecipeCancel,
+  handleAddRecipe,
+}) {
+  useEffect(() => {
+    if (existingRecipe) {
+      setName(existingRecipe.name)
+      setCategory(existingRecipe.category)
+      setDirections(existingRecipe.directions)
+      setPublishDate(existingRecipe.publishDate.toISOString().split("T")[0])
+      setIngredients(existingRecipe.ingredients)
+    } else {
+      resetForm()
+    }
+  }, [existingRecipe])
   const [name, setName] = useState("")
   const [category, setCategory] = useState("")
   const [publishDate, setPublishDate] = useState(
@@ -28,7 +44,12 @@ function AddEditRecipeForm({ handleAddRecipe }) {
       ingredients,
     }
 
-    handleAddRecipe(newRecipe)
+    if (existingRecipe) {
+      handleUpdateRecipe(newRecipe, existingRecipe.id)
+    } else {
+      handleAddRecipe(newRecipe)
+    }
+    resetForm()
   }
 
   function handleAddIngredient(e) {
@@ -47,12 +68,20 @@ function AddEditRecipeForm({ handleAddRecipe }) {
     setIngredientName("")
   }
 
+  function resetForm() {
+    setName("")
+    setCategory("")
+    setDirections("")
+    setPublishDate("")
+    setIngredients([])
+  }
+
   return (
     <form
       onSubmit={handleRecipeFormSubmit}
       className="add-edit-recipe-form-container"
     >
-      <h2>レシピの追加・編集</h2>
+      {existingRecipe ? <h2>レシピの編集</h2> : <h2>レシピの追加</h2>}
       <div className="top-form-section">
         <div className="fields">
           <label className="recipe-label input-label">
@@ -161,8 +190,17 @@ function AddEditRecipeForm({ handleAddRecipe }) {
       </div>
       <div className="action-buttons">
         <button type="submit" className="primary-button action-button">
-          レシピを作成
+          {existingRecipe ? "編集内容を保存" : "レシピを作成"}
         </button>
+        {existingRecipe ? (
+          <button
+            className="primary-button action-button"
+            type="button"
+            onClick={handleEditRecipeCancel}
+          >
+            キャンセル
+          </button>
+        ) : null}
       </div>
     </form>
   )

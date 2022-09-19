@@ -7,6 +7,8 @@ import FirebaseFireStoreService from "./FirebaseFireStoreService"
 
 function App() {
   const [user, setUser] = useState(null)
+  const [currentRecipe, setCurrentRecipe] = useState(null)
+
   const [recipes, setRecipes] = useState()
 
   useEffect(() => {
@@ -21,18 +23,20 @@ function App() {
   }, [user])
 
   async function fetchRecipes() {
-
     const queries = []
-    if(!user) {
+    if (!user) {
       queries.push({
-        field: 'isPublished',
-        condition: '==',
-        value: true
+        field: "isPublished",
+        condition: "==",
+        value: true,
       })
     }
     let fetchRecipes = []
     try {
-      const response = await FirebaseFireStoreService.readDocument({collection: "recipes", queries: queries})
+      const response = await FirebaseFireStoreService.readDocument({
+        collection: "recipes",
+        queries: queries,
+      })
       const newRecipes = response.docs.map((recipeDoc) => {
         const id = recipeDoc.id
         const data = recipeDoc.data()
@@ -52,11 +56,45 @@ function App() {
 
   async function handleFetchRecipes() {
     try {
-      setRecipes( await fetchRecipes())
+      setRecipes(await fetchRecipes())
     } catch (error) {
       console.error(error.message)
       throw error
     }
+  }
+
+  async function handleUpdateRecipe(newRecipe, recipeId) {
+    try {
+      await FirebaseFireStoreService.updateDocument(
+        "recipes",
+        recipeId,
+        newRecipe
+      )
+
+      handleFetchRecipes()
+
+      alert(`successfully update a recipe with an ID = ${recipeId}`)
+    } catch (error) {
+      alert(error.message)
+      throw error
+    } finally {
+      setCurrentRecipe(null)
+    }
+  }
+
+  function handleEditRecipeClick(recipeId) {
+    const selectedRecipe = recipes.find((recipe) => {
+      return recipe.id === recipeId
+    })
+
+    if (selectedRecipe) {
+      setCurrentRecipe(selectedRecipe)
+      window.scrollTo(0, document.body.scrollHeight)
+    }
+  }
+
+  function handleEditRecipeCancel() {
+    setCurrentRecipe(null)
   }
 
   function lookupCategoryLabel(categoryKey) {
@@ -108,8 +146,9 @@ function App() {
                 {recipes.map((recipe) => {
                   return (
                     <div className="recipe-card" key={recipe.id}>
-                      {recipe.isPublished ? null : 
-                      <div className="unpublished">未公開</div>}
+                      {recipe.isPublished ? null : (
+                        <div className="unpublished">未公開</div>
+                      )}
                       <div className="recipe-name">{recipe.name}</div>
                       <div className="recipe-field">
                         カテゴリー： {recipe.category}
@@ -117,6 +156,16 @@ function App() {
                       <div className="recipe-field">
                         公開日； {formatDate(recipe.publishDate)}
                       </div>
+
+                      {user ? (
+                        <button
+                          className="primary-button edit-button"
+                          type="button"
+                          onClick={() => handleEditRecipeClick(recipe.id)}
+                        >
+                          編集
+                        </button>
+                      ) : null}
                     </div>
                   )
                 })}
@@ -124,7 +173,14 @@ function App() {
             ) : null}
           </div>
         </div>
-        {user ? <AddEditRecipeForm handleAddRecipe={handleAddRecipe} /> : null}
+        {user ? (
+          <AddEditRecipeForm
+            existingRecipe={currentRecipe}
+            handleUpdateRecipe={handleUpdateRecipe}
+            handleEditRecipeCancel={handleEditRecipeCancel}
+            handleAddRecipe={handleAddRecipe}
+          />
+        ) : null}
       </div>
     </div>
   )
