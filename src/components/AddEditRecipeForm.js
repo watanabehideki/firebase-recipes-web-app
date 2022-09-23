@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import ImageUploadPreview from "./ImageUploadPreview"
 
 function AddEditRecipeForm({
   existingRecipe,
@@ -14,6 +15,7 @@ function AddEditRecipeForm({
       setDirections(existingRecipe.directions)
       setPublishDate(existingRecipe.publishDate.toISOString().split("T")[0])
       setIngredients(existingRecipe.ingredients)
+      setImageUrl(existingRecipe.imageUrl)
     } else {
       resetForm()
     }
@@ -26,7 +28,7 @@ function AddEditRecipeForm({
   const [directions, setDirections] = useState("")
   const [ingredients, setIngredients] = useState([])
   const [ingredientName, setIngredientName] = useState("")
-
+  const [imageUrl, setImageUrl] = useState("")
   function handleRecipeFormSubmit(e) {
     e.preventDefault()
     if (ingredients.length === 0) {
@@ -43,6 +45,7 @@ function AddEditRecipeForm({
       publishDate: new Date(publishDate),
       isPublished,
       ingredients,
+      imageUrl,
     }
 
     if (existingRecipe) {
@@ -65,6 +68,11 @@ function AddEditRecipeForm({
       return
     }
 
+    if(!imageUrl) {
+      alert("レシピ画像がありません。入力欄を再確認してください。")
+      return
+    }
+
     setIngredients([...ingredients, ingredientName])
     setIngredientName("")
   }
@@ -75,6 +83,7 @@ function AddEditRecipeForm({
     setDirections("")
     setPublishDate("")
     setIngredients([])
+    setImageUrl("")
   }
 
   return (
@@ -84,6 +93,15 @@ function AddEditRecipeForm({
     >
       {existingRecipe ? <h2>レシピの編集</h2> : <h2>レシピの追加</h2>}
       <div className="top-form-section">
+        <div className="image-input-box">
+          レシピ画像：
+          <ImageUploadPreview
+            basePath="recipes"
+            existingImageUrl={imageUrl}
+            handleUploadFinish={(downloadUrl) => setImageUrl(downloadUrl)}
+            handleUploadCancel={() => setImageUrl("")}
+          />
+        </div>
         <div className="fields">
           <label className="recipe-label input-label">
             レシピ名：

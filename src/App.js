@@ -27,7 +27,7 @@ function App() {
       })
       .finally(() => setIsLoading(false))
 
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, categoryFilter, orderBy, recipesPerPage])
 
   async function fetchRecipes(cursorId = "") {
@@ -257,6 +257,15 @@ function App() {
                         <div className="unpublished">未公開</div>
                       )}
                       <div className="recipe-name">{recipe.name}</div>
+                      <div className="recipe-image-box">
+                        {recipe.imageUrl ? (
+                          <img
+                            src={recipe.imageUrl}
+                            alt={recipe.name}
+                            className="recipe-image"
+                          />
+                        ) : null}
+                      </div>
                       <div className="recipe-field">
                         カテゴリー： {recipe.category}
                       </div>
@@ -299,7 +308,9 @@ function App() {
                 type="button"
                 onClick={handleLoadMoreRecipesClick}
                 className="primary-button"
-              >もっと見る</button>
+              >
+                もっと見る
+              </button>
             </div>
           </>
         ) : null}
