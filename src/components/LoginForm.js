@@ -17,7 +17,7 @@ function LoginForm({ existingUser }) {
   }
 
   function handleLogout() {
-    FirebaseAuthService.loginUser()
+    FirebaseAuthService.logoutUser()
   }
 
   async function handleSendResetPasswordEmail() {
@@ -34,13 +34,13 @@ function LoginForm({ existingUser }) {
     }
   }
 
-  // async function handleLoginWithGoogle() {
-  //   try {
-  //     await FirebaseAuthService.loginWithGoogle()
-  //   } catch (error) {
-  //     alert(error.message)
-  //   }
-  // }
+  async function handleLoginWithGoogle() {
+    try {
+      await FirebaseAuthService.loginWithGoogle()
+    } catch (error) {
+      alert(error.message)
+    }
+  }
 
   return (
     <div className="login-form-container">
@@ -78,7 +78,7 @@ function LoginForm({ existingUser }) {
             />
           </label>
           <div className="button-box">
-            <button type="button" className="primary-button">
+            <button type="submit" className="primary-button">
               Login
             </button>
             <button
@@ -88,13 +88,13 @@ function LoginForm({ existingUser }) {
             >
               Reset Password
             </button>
-            {/* <button
+            <button
               type="button"
               onClick={handleLoginWithGoogle}
               className="primary-button"
             >
               Login with Google
-            </button> */}
+            </button>
           </div>
         </form>
       )}
