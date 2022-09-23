@@ -26,6 +26,8 @@ function App() {
         throw error
       })
       .finally(() => setIsLoading(false))
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, categoryFilter, orderBy, recipesPerPage])
 
   async function fetchRecipes(cursorId = "") {
@@ -166,17 +168,17 @@ function App() {
     setCurrentRecipe(null)
   }
 
-  function lookupCategoryLabel(categoryKey) {
-    const categories = {
-      breadsSandwichesAndPizza: "パン、サンドウィッチ、ピザ",
-      eggsAndBreakfast: "たまごと朝食",
-      dessertsAndBakedGoods: "魚とシーフード",
-      veg: "野菜",
-    }
+  // function lookupCategoryLabel(categoryKey) {
+  //   const categories = {
+  //     breadsSandwichesAndPizza: "パン、サンドウィッチ、ピザ",
+  //     eggsAndBreakfast: "たまごと朝食",
+  //     dessertsAndBakedGoods: "魚とシーフード",
+  //     veg: "野菜",
+  //   }
 
-    const label = categories[categoryKey]
-    return label
-  }
+  //   const label = categories[categoryKey]
+  //   return label
+  // }
 
   function formatDate(date) {
     const day = date.getUTCDate()
