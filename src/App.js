@@ -13,6 +13,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [categoryFilter, setCategoryFilter] = useState("")
   const [orderBy, setOrderBy] = useState("publishDateDesc")
+  const [recipesPerPage, setRecipesPerPage] = useState(3)
 
   useEffect(() => {
     setIsLoading(true)
@@ -25,9 +26,9 @@ function App() {
         throw error
       })
       .finally(() => setIsLoading(false))
-  }, [user, categoryFilter, orderBy])
+  }, [user, categoryFilter, orderBy, recipesPerPage])
 
-  async function fetchRecipes() {
+  async function fetchRecipes(cursorId = "") {
     const queries = []
 
     // where句の設定
@@ -64,11 +65,13 @@ function App() {
 
     let fetchRecipes = []
     try {
-      const response = await FirebaseFireStoreService.readDocument({
+      const response = await FirebaseFireStoreService.readDocuments({
         collection: "recipes",
         queries: queries,
         orderByField: orderByField,
         orderByDirection: orderByDirection,
+        perPage: recipesPerPage,
+        cursorId: cursorId,
       })
       const newRecipes = response.docs.map((recipeDoc) => {
         const id = recipeDoc.id
@@ -78,7 +81,11 @@ function App() {
         return { ...data, id }
       })
 
-      fetchRecipes = [...newRecipes]
+      if (cursorId) {
+        fetchRecipes = [...recipes, ...newRecipes]
+      } else {
+        fetchRecipes = [...newRecipes]
+      }
     } catch (error) {
       console.error(error.message)
       throw error
@@ -87,9 +94,21 @@ function App() {
     return fetchRecipes
   }
 
-  async function handleFetchRecipes() {
+  function handleRecipesPerPageChange(event) {
+    const recipesPerPage = event.target.value
+    setRecipes([])
+    setRecipesPerPage(recipesPerPage)
+  }
+
+  function handleLoadMoreRecipesClick() {
+    const lastRecipe = recipes[recipes.length - 1]
+    const cursorId = lastRecipe.id
+    handleFetchRecipes(cursorId)
+  }
+
+  async function handleFetchRecipes(cursorId = "") {
     try {
-      setRecipes(await fetchRecipes())
+      setRecipes(await fetchRecipes(cursorId))
     } catch (error) {
       console.error(error.message)
       throw error
@@ -210,7 +229,7 @@ function App() {
           </label>
           <label className="input-label">
             公開日：
-          <select
+            <select
               className="select"
               required
               value={orderBy}
@@ -259,6 +278,29 @@ function App() {
             ) : null}
           </div>
         </div>
+        {isLoading || (recipes && recipes.length > 0) ? (
+          <>
+            <label className="input-label">
+              表示件数：
+              <select
+                value={recipesPerPage}
+                onChange={handleRecipesPerPageChange}
+                className="select"
+              >
+                <option value="3">3</option>
+                <option value="6">6</option>
+                <option value="9">9</option>
+              </select>
+            </label>
+            <div className="pagination">
+              <button
+                type="button"
+                onClick={handleLoadMoreRecipesClick}
+                className="primary-button"
+              >もっと見る</button>
+            </div>
+          </>
+        ) : null}
         {user ? (
           <AddEditRecipeForm
             existingRecipe={currentRecipe}

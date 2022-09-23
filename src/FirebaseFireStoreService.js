@@ -6,11 +6,17 @@ const createDocument = (collection, document) => {
   return firestore.collection(collection).add(document)
 }
 
-const readDocument = ({
+const readDocument = (collection, id) => {
+  return firestore.collection(collection).doc(id).get()
+}
+
+const readDocuments = async ({
   collection,
   queries,
   orderByField,
   orderByDirection,
+  perPage,
+  cursorId,
 }) => {
   let collectionRef = firestore.collection(collection)
 
@@ -29,6 +35,18 @@ const readDocument = ({
   if (orderByField && orderByDirection) {
     collectionRef = collectionRef.orderBy(orderByField, orderByDirection)
   }
+
+  // limit句
+  if (perPage) {
+    collectionRef = collectionRef.limit(perPage)
+  }
+
+  // 指定されたID以降のレコードを取得する
+  if (cursorId) {
+    const document = await readDocument(collection, cursorId)
+    collectionRef = collectionRef.startAfter(document)
+  }
+
   return collectionRef.get()
 }
 
@@ -42,7 +60,7 @@ const deleteDocument = (collection, id) => {
 
 const FirebaseFireStoreService = {
   createDocument,
-  readDocument,
+  readDocuments,
   updateDocument,
   deleteDocument,
 }
